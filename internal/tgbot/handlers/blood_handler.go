@@ -40,6 +40,9 @@ func (h *BloodHandler) CreateBloodAnalyze(c tele.Context) error {
 	h.state[userID] = &domain.QuizState{Step: 0, DTO: tgdto.BloodDTO{UserID: userID}}
 	h.mu.Unlock()
 
+	_ = c.Send(&tele.Sticker{File: tele.File{FileID: afterAnalyzeSticker}})
+	_ = c.Send("Ждем твои анализы 😷")
+
 	return c.Send(domain.QuizSteps[0].Prompt)
 }
 
@@ -76,16 +79,27 @@ func (h *BloodHandler) BloodQuiz(c tele.Context) error {
 	blood, err := mappers.BloodDTOtoBlood(&st.DTO)
 	if err != nil {
 		if bErr, ok := errors.AsType[*apperrors.DomainValidationError](err); ok {
-			return c.Send(fmt.Sprintf("Твои данные нереалистичны: %s", bErr.Error()))
+			_ = c.Send("❗️❗️❗️ОШИБКА❗️❗️❗️")
+			_ = c.Send(&tele.Sticker{File: tele.File{FileID: invalidRangeSticker}})
+			return c.Send(fmt.Sprintf("Твои данные нереалистичны:\n%s", bErr.Error()))
 		}
 
 		return c.Send("Не могу обработать твои данные")
 	}
 
+	_ = c.Send("AI врач и лаборант трудятся, читая твоя анамнез ☺️")
+	_ = c.Send(&tele.Sticker{File: tele.File{FileID: waitingServerResponseSticker}})
+
 	pdf, err := h.s.CreateBloodAnalyze(context.Background(), blood)
 	if err != nil {
-		return c.Send("Ошибка при создании анализа крови")
+		_ = c.Send("❗️❗️❗️ОШИБКА❗️❗️❗️")
+		_ = c.Send(&tele.Sticker{File: tele.File{FileID: serverResponseErrorSticker}})
+		return c.Send("Ошибка при чтении твоего анализа 😖")
 	}
+
+	_ = c.Send("Работа проделана успешно!")
+
+	_ = c.Send(&tele.Sticker{File: tele.File{FileID: serverResponseSuccessSticker}})
 
 	pdfName := fmt.Sprintf(
 		"report_%s_%s.pdf",

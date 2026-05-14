@@ -40,11 +40,13 @@ func (h *UserHandler) Register(c tele.Context) error {
 		mappers.RegisterRequestDTOToUser(&req),
 	); err != nil {
 		if errors.Is(err, apperrors.ErrUserAlreadyExists) {
-			return c.Send("Вы уже зарегистрированы, продолжайте", menu)
+			return c.Send("Ты уже зарегистрирован. Нажми \"Анализировать\", чтобы начать", menu)
 		}
 
 		return c.Send("Ошибка регистрации")
 	}
 
-	return c.Send("Регистрация успешна", menu)
+	_ = c.Send(&tele.Sticker{File: tele.File{FileID: registerSuccessSticker}})
+
+	return c.Send("Приветствую в нашей AI лаборатории! Нажми \"Анализировать\", чтобы начать 👽", menu)
 }
