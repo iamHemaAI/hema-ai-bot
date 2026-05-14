@@ -1,0 +1,23 @@
+bot:
+  token: ${TG_TOKEN}
+  poller: 10s
+
+blood_report:
+  base_url: ${BLOOD_REPORT_URL}
+
+sqlite:
+  path: "db/hema-ai-bot.db"
+
+logger:
+  dev:
+    level: debug
+    development: true
+    encoding: console
+    outputPaths: ["stdout"]
+    errorOutputPaths: ["stdout"]
+  prod:
+    level: warn
+    development: false
+    encoding: json
+    outputPaths: ["stdout"]
+    errorOutputPaths: ["stdout"]

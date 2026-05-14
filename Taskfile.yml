@@ -1,0 +1,45 @@
+version: "3"
+
+tasks:
+  up:
+    desc: Start local dev environment
+    cmds:
+      - task: migrate
+      - docker compose -f docker-compose.local.yml up -d --build
+
+  down:
+    desc: Stop and remove containers
+    cmds:
+      - docker compose -f docker-compose.local.yml down -v
+
+  logs:
+    desc: Tail container logs
+    cmds:
+      - docker compose -f docker-compose.local.yml logs -f
+
+  restart:
+    desc: Restart containers
+    cmds:
+      - docker compose -f docker-compose.local.yml restart
+
+  run:
+    desc: Run app locally with air (no docker)
+    cmds:
+      - air -c .air.toml
+
+  migrate:
+    desc: Run goose migrations
+    dotenv: [".env"]
+    cmds:
+      - goose up
+
+  migrate-down:
+    desc: Rollback last migration
+    dotenv: [".env"]
+    cmds:
+      - goose down
+
+  build:
+    desc: Build the binary
+    cmds:
+      - go build -o ./tmp/main ./cmd/bot

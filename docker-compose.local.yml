@@ -1,0 +1,15 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: build/local/Dockerfile
+    container_name: hema-ai-bot
+    restart: on-failure
+    network_mode: host
+    env_file:
+      - .env
+    environment:
+      - HTTP_PROXY=http://127.0.0.1:10808
+      - HTTPS_PROXY=http://127.0.0.1:10808
+    volumes:
+      - .:/app

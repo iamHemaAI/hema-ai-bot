@@ -1,0 +1,4 @@
+FROM golang:1.26.3-alpine
+RUN go install github.com/air-verse/air@latest
+WORKDIR /app
+CMD ["air", "-c", ".air.toml"]
